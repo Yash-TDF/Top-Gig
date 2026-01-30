@@ -1,9 +1,9 @@
-from fastapi import  HTTPException,UploadFile, File, Form
+from fastapi import  HTTPException,UploadFile, File, Form,Depends
 from fastapi.responses import RedirectResponse
 import requests
 from database import SessionLocal
 from models import User,Mentee
-from utils import create_jwt,verify_password,hash_password
+from utils import create_jwt,verify_password,hash_password,get_current_user
 from sqlalchemy.orm import Session
 import os,uuid
 from datetime import datetime
@@ -256,3 +256,10 @@ def create_profile(
     db.commit()
     db.refresh(mentee)
     return {"message": "Profile created successfully"}
+
+def get_me(user: User = Depends(get_current_user)):
+    return {
+        "id": user.id,
+        "email": user.email,
+        "role": user.role
+    }
