@@ -83,4 +83,6 @@ def create_profile(
 ):
     return auth_repo.create_profile(name, bio, photo, user, db)
 
-
+@router.get("/me")
+def get_me(user: User = Depends(utils.get_current_user)):
+    return auth_repo.get_me(user)

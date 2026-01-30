@@ -5,6 +5,7 @@ from passlib.context import CryptContext
 from fastapi import  HTTPException,Depends,Request
 from models import User
 import os
+from sqlalchemy.orm import Session
 
 # JWT configuration
 JWT_SECRET = os.getenv("JWT_SECRET")
@@ -33,7 +34,7 @@ def create_jwt(data: dict):
 
 def get_current_user(
     request: Request,
-    db = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     token = request.cookies.get("access_token")
 
@@ -43,6 +44,8 @@ def get_current_user(
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGO])
         email = payload.get("email")
+        if not email:
+            raise HTTPException(status_code=401)
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
